@@ -15,7 +15,7 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 - 🧱 Full support for nested DTOs (recursive)
 - 🧪 Property type validation and class-level error tracking
 - ⚡ `make()` method (recommended) for flexible and different modes using, or `new DTOClass()` for strict using
-- 🛠️ `toArray()` method converts the current object instance into an array representation
+- 📚 `toArray()` method converts the current object instance into an array representation
 - 🧩 `Closure` support for lazy-loaded properties
 - 🔧 `debug()` method with full structural output
 - 📤 Framework-agnostic — works with pure PHP classes
@@ -68,11 +68,28 @@ $data = [
     'is_paid' => true
 ];
 
-$payment = PaymentDTO::make($data, strict: true)->debug();
-
+$payment = PaymentDTO::make($data, strict: false)->debug();
+// or
+$payment = PaymentDTO::make($data, strict: false);
 if (!$payment->isValid()) {
-    print_r($payment->getErrors());
+    dump($payment->getErrors());
 }
+
+// Data output to an array is supported
+$payment = PaymentDTO::make($data)->toArray();
+
+```
+
+---
+## ✒️ Constructor-Based Instantiation
+
+DTOs can also be instantiated directly via the constructor (including nested DTOs), but all values must be fully typed and pre-resolved.
+```php
+$payment = (new PaymentDTO(
+    1, 'paypal', 100.00, 'John', 'john@example.com', '123456789', 'test', true, new OrderDTO(
+        1, new UserDTO(1, 'User Name')
+    )
+))->toArray();
 ```
 
 ---
