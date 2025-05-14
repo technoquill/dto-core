@@ -1,10 +1,10 @@
 # Type-safe, test-friendly, and extendable DTO
 
-![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue?style=flat-square&logo=php)
+![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue?style=flat-square&logo=php)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Repo size](https://img.shields.io/github/repo-size/technoquill/dto-core?style=flat-square)
 
-**dto-core** is a lightweight, typed, and flexible base layer for working with Data Transfer Objects (DTOs) in PHP 8.2+.  
+**dto-core** is a lightweight, typed, and flexible base layer for working with Data Transfer Objects (DTOs) in PHP 8.1+.  
 It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, and full debug output.
 
 ---
@@ -19,14 +19,14 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 - 🧩 `Closure` support for lazy-loaded properties
 - 🔧 `debug()` method with full structural output
 - 📤 Framework-agnostic — works with pure PHP classes
-- 🔩 Optimized for PHP 8.2+
-- ⚙️ Compatible with Symfony 6.4, Laravel 10+, and modern typed PHP codebases.
+- 🔩 Optimized for PHP 8.1+
+- ⚙️ Compatible with Symfony 6.1, Laravel 10+, and modern typed PHP codebases.
 
 ---
 
 ## 🧬 Requirements
 
-- PHP **8.2 or higher**
+- PHP **8.1 or higher**
 - [symfony/var-dumper](https://packagist.org/packages/symfony/var-dumper)
 
 ---
