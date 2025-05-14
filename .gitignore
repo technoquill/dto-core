@@ -1,0 +1,10 @@
+.idea
+
+# #####
+tests
+app
+vendor
+public
+
+# ####
+composer.lock
