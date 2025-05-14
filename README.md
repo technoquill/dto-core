@@ -33,6 +33,15 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 
 ## 🛠 Installation
 
+Add to composer.json
+```json
+"repositories": [
+  {
+    "type": "vcs",
+    "url": "https://github.com/technoquill/dto-core"
+  }
+]
+```
 ```bash
 composer require technoquill/dto-core
 ```

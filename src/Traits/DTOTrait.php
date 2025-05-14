@@ -18,7 +18,6 @@ use ReflectionClass;
 use ReflectionException;
 use ReflectionProperty;
 use RuntimeException;
-use Technoquill\DTO\AbstractDTO;
 use Technoquill\DTO\Contracts\DTOInterface;
 
 

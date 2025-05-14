@@ -5,13 +5,12 @@
   "license": "MIT",
   "autoload": {
     "psr-4": {
-      "Technoquill\\DTO\\": "src/",
-      "App\\": "app/"
+      "Technoquill\\DTO\\": "src/"
     }
   },
   "require": {
     "php": ">=8.2",
-    "symfony/error-handler": "^6.4"
+    "symfony/error-handler": "6.4*"
   },
   "require-dev": {
   "phpunit/phpunit": "^9.5",
