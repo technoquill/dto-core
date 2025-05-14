@@ -52,8 +52,14 @@ trait DebuggableTrait
      */
     public function debug(): self
     {
+        static::$debug = true;
         VarDumper::dump($this);
         return $this;
+    }
+
+    public static function isDebugEnabled(): bool
+    {
+        return static::$debug;
     }
 
 
