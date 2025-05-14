@@ -112,21 +112,6 @@ trait DTOTrait
 
 
     /**
-     * Enables or disables strict mode for the DTO.
-     *
-     * @param bool $strict
-     * @return DTOTrait|AbstractDTO
-     */
-    public function strictMode(bool $strict = true): self
-    {
-        if (!isset(static::$strict[static::class])) {
-            static::$strict[static::class] = $strict;
-        }
-        return $this;
-    }
-
-
-    /**
      * Normalizes the provided arguments by evaluating closures and
      * converting them to their return values.
      *
