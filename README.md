@@ -1,4 +1,4 @@
-# dto-core
+# Minimal and type-safe DTO base for PHP projects — with support for structured instantiation, partial data filling, and runtime validation.
 
 ![PHP Version](https://img.shields.io/badge/PHP-8.2%2B-blue?style=flat-square&logo=php)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
