@@ -52,8 +52,6 @@ abstract class AbstractDTO implements DTOInterface
     protected static array $dtoProperties = [];
 
 
-    protected static bool $debug = false;
-
 
     use DTOTrait, DebuggableTrait;
 
@@ -100,6 +98,12 @@ abstract class AbstractDTO implements DTOInterface
         return json_decode(
             json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR
         );
+    }
+
+
+    public function __destruct()
+    {
+        self::$dtoProperties = [];
     }
 
 }

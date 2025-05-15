@@ -84,10 +84,8 @@ trait DTOTrait
 
         foreach ($arguments as $key => $value) {
 
-            // Fill data to compare differences between DTO properties and passed properties (only when $this->debug() is enabled)
-            if (static::isDebugEnabled()) {
-                static::$dtoProperties[$class][$key] = $value;
-            }
+            // Fill data to compare differences between DTO properties and passed properties
+            static::$dtoProperties[$class][] = $key;
 
             if (!property_exists($class, $key)) {
                 if (!$strict) {
