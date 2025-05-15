@@ -51,54 +51,71 @@ composer require technoquill/dto-core
 ## ⚙️ Quick Example
 
 ```php
-final class PaymentDTO extends AbstractDTO
+
+final class UserDTO extends AbstractDTO
 {
     public function __construct(
-        public int $id,
+        public int    $id,
         public string $type,
-        public float $amount,
-        public string $name,
+        public string $first_name,
+        public string $last_name,
         public string $email,
         public string $phone,
+        public array  $address = [], // for ex. relation
         public string $annotation,
-        public bool $is_paid
-    ) {}
+        public bool   $blocked,
+        public string $created_at
+    )
+    {}
+}
+
+final class UserAddressDTO extends AbstractDTO
+{
+    public function __construct(
+        public string  $street,
+        public string  $city,
+        public string  $postalCode,
+        public string  $country,
+        public ?string $state = null,
+        public ?string $houseNumber = null,
+        public ?string $apartment = null
+    )
+    {}
 }
 
 // Create via array
-$data = [
-    'id' => 1,
-    'type' => 'paypal',
-    'amount' => 100.55,
-    'name' => 'John',
+$user = UserDTO::make([
+    'id' => 435,
+    'type' => 'manager',
+    'first_name' => 'John',
+    'last_name' => 'Smith',
     'email' => 'john@example.com',
     'phone' => '123456789',
-    'annotation' => fn() => strip_tags('<p>Note</p>'),
-    'is_paid' => true
-];
+    'address' => UserAddressDTO::make([
+        'street' => '123 Main St',
+        'city' => 'New York',
+        'postalCode' => '10001',
+        'country' => 'USA',
+        //'state' => 'NY', // optional; dto makes it nullable
+        'houseNumber' => '123',
+        'apartment' => '123A',
+    ])->toArray(),
+    'annotation' => static fn() => strip_tags('<p>Some annotation</p>'),
+    'blocked' => false,
+    'created_at' => '2022-10-03 22:59:52'
+])->toArray();
 
-$payment = PaymentDTO::make($data, strict: false)->debug();
+dd($user);
+
 // or
-$payment = PaymentDTO::make($data, strict: false);
-if (!$payment->isValid()) {
-    dump($payment->getErrors());
+$dtoData = PaymentDTO::make($data, false);
+if (!$dtoData->isValid()) {
+    dump($dtoData->getErrors());
 }
 
 // Data output to an array is supported
 $payment = PaymentDTO::make($data)->toArray();
 
-```
-
----
-## ✒️ Constructor-Based Instantiation
-
-DTOs can also be instantiated directly via the constructor (including nested DTOs), but all values must be fully typed and pre-resolved.
-```php
-$payment = (new PaymentDTO(
-    1, 'paypal', 100.00, 'John', 'john@example.com', '123456789', 'test', true, new OrderDTO(
-        1, new UserDTO(1, 'User Name')
-    )
-))->toArray();
 ```
 
 ---
@@ -112,11 +129,33 @@ final class OrderDTO extends AbstractDTO {
         public PaymentDTO $payment
     ) {}
 }
+final class PaymentDTO extends AbstractDTO {
+    public function __construct(
+        public int $id,
+        public float $amount
+    ) {}
+}
 
 $order = OrderDTO::make([
     'id' => 10,
-    'payment' => $data
-], false);
+    'payment' => PaymentDTO::make([
+        'id' => 435,
+        'amount' => 765.35,
+    ])
+]);
+
+```
+
+---
+## ✒️ Constructor-Based Instantiation
+
+DTOs can also be instantiated directly via the constructor (including nested DTOs), but all values must be fully typed and pre-resolved.
+
+> **Note:**  
+> Always works in strict mode
+> 
+```php
+$payment = (new PaymentDTO(435, 765.35))->toArray();
 ```
 
 ---
@@ -128,9 +167,11 @@ src/
 ├── AbstractDTO.php
 ├── Contracts/
 │   └── DTOInterface.php
+├── Support/
+│   └── LoggerContext.php
 ├── Traits/
-│   ├── DTOTrait.php
-│   └── DebuggableTrait.php
+│   ├── DebuggableTrait.php
+│   └── DTOTrait.php
 ```
 
 ---

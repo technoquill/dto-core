@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 /**
  * @author M.Kulyk
  * @copyright 2025 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.0.0
+ * @version 1.1.0
  * @package Technoquill\DTO
  * @since 1.0.0
  */
@@ -29,34 +30,7 @@ use Technoquill\DTO\Traits\DTOTrait;
 abstract class AbstractDTO implements DTOInterface
 {
 
-    /**
-     * Holds the errors that occurred during the DTO initialization process.
-     *
-     * @var array
-     */
-    protected static array $errors = [];
-
-    /**
-     * Flag to enable strict validation of properties.
-     *
-     * @var array
-     */
-    protected static array $strict = [];
-
-
-    /**
-     * Properties passed through DTO
-     *
-     * @var array
-     */
-    protected static array $dtoProperties = [];
-
-
-    protected static bool $debug = false;
-
-
     use DTOTrait, DebuggableTrait;
-
 
     /**
      * Creates a new instance of the DTO class using the provided arguments.
@@ -68,14 +42,11 @@ abstract class AbstractDTO implements DTOInterface
      */
     public static function make(array $data, bool $strict = true): static
     {
-        // Set the strict mode flag.
-        self::$strict[static::class] = $strict;
-
         // Ensure that the DTO does not mix constructor-based and property-based approaches for defining its structure.
         self::assertNoMixedStructure();
 
         // Validate the arguments and normalize them. If strict validation is enabled, throw an exception if any of the arguments are missing.
-        $data = self::propertiesValidate($data, $strict);
+        $data = self::collect($data, $strict);
 
         // If the class has a constructor, use it to initialize the properties.
         $reflectionClass = new ReflectionClass(static::class);

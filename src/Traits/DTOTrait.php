@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @author M.Kulyk
  * @copyright 2025 M.Kulyk
@@ -19,6 +20,7 @@ use ReflectionException;
 use ReflectionProperty;
 use RuntimeException;
 use Technoquill\DTO\Contracts\DTOInterface;
+use Technoquill\DTO\Support\LoggerContext;
 
 
 /**
@@ -31,82 +33,49 @@ use Technoquill\DTO\Contracts\DTOInterface;
  * @throws Exception If any other exception occurs during the property initialization process.
  * @throws ReflectionException If reflection-related errors occur.
  *
- * @internal
- *
- * @property static[] $errors Runtime validation errors grouped by class
- * @property static[] $strict Strict mode flags grouped by class
- * @property-read static[] $dtoProperties Data to compare differences between DTO properties and passed properties
- *
- *  Note: The class using this trait must declare:
- *    a protected static array $errors = [];
- *    protected static array $strict = [];
- *
  */
 trait DTOTrait
 {
 
-
-    /**
-     * @return bool
-     */
-    public function isValid(): bool
-    {
-        return empty(static::$errors ?? []);
-    }
-
-    /**
-     * @return array
-     */
-    public function getErrors(): array
-    {
-        $result = [];
-        if (!empty(static::$errors)) {
-            foreach (static::$errors as $class => $errors) {
-                $result[$class] = $errors;
-            }
-        }
-        return $result;
-    }
-
-
     /**
      * Validates the provided arguments against the class properties.
-     * @param array $arguments
+     * @param array $data
      * @param bool $strict
      * @return array
      * @throws ReflectionException
      */
-    private static function propertiesValidate(array $arguments, bool $strict): array
+    private static function collect(array $data, bool $strict): array
     {
         $class = static::class;
         $reflectionClass = new ReflectionClass($class);
-        $arguments = self::normalizeArguments($arguments);
+        $data = self::normalizeDataValue($data);
+        if (!$strict) {
+            LoggerContext::enable($class);
+        }
 
-        foreach ($arguments as $key => $value) {
+        // Reset the logger context for the current class.
+        LoggerContext::reset($class);
+        // Set the strict mode flag.
+        LoggerContext::set($class, 'strict', $strict);
+        // Fill data to compare differences between DTO properties and passed properties
+        LoggerContext::set($class, 'properties', $data);
 
-            // Fill data to compare differences between DTO properties and passed properties (only when $this->debug() is enabled)
-            if (static::isDebugEnabled()) {
-                static::$dtoProperties[$class][$key] = $value;
-            }
-
+        foreach ($data as $key => $value) {
             if (!property_exists($class, $key)) {
                 if (!$strict) {
-                    unset($arguments[$key]);
+                    unset($data[$key]);
                 }
-                self::$errors[static::class][] = "Property {$class}::\${$key} doesn't exist!";
+                LoggerContext::set($class, 'errors', ["Property {$class}::\${$key} doesn't exist!"]);
             }
             if (property_exists($class, $key)) {
                 $propertyType = $reflectionClass->getProperty($key)?->getType()?->getName();
                 if (!$value instanceof DTOInterface && static::normalizeType($propertyType) !== gettype($value)) {
-                    static::$errors[static::class][] = "Property {$class}::\${$key} must be " . $propertyType . " but " . gettype($value) . " given!";
+                    LoggerContext::set($class, 'errors', ["Property {$class}::\${$key} must be " . $propertyType . " but " . gettype($value) . " given!"]);
                 }
             }
         }
-        if (!empty(static::$errors) && !empty(static::$errors[static::class]) && $strict) {
-            throw new RuntimeException(implode("\n", static::$errors[static::class]));
-        }
 
-        return $arguments;
+        return $data;
     }
 
 
@@ -117,7 +86,7 @@ trait DTOTrait
      * @param array $arguments
      * @return array
      */
-    private static function normalizeArguments(array $arguments): array
+    private static function normalizeDataValue(array $arguments): array
     {
         $normalized = [];
         foreach ($arguments as $key => $value) {
@@ -151,13 +120,54 @@ trait DTOTrait
      */
     private static function assertNoMixedStructure(): void
     {
-        $ref = new ReflectionClass(static::class);
-        $hasConstructor = $ref->getConstructor()?->getParameters() ?? [];
-        $props = $ref->getProperties(ReflectionProperty::IS_PUBLIC);
+        $reflection = new ReflectionClass(static::class);
+        $hasConstructor = $reflection->getConstructor()?->getParameters() ?? [];
+        $props = $reflection->getProperties(ReflectionProperty::IS_PUBLIC);
 
         if (!empty($hasConstructor) && count($props) > count($hasConstructor)) {
             throw new LogicException("Mixing constructor-based and property-based DTO is not allowed.");
         }
     }
+
+
+    /**
+     * @return bool
+     */
+    public function isValid(): bool
+    {
+        return empty(LoggerContext::getAllErrors());
+    }
+
+    /**
+     * @return array
+     */
+    public function getErrors(): array
+    {
+        return LoggerContext::getAllErrors();
+    }
+
+
+    /**
+     * @return array
+     */
+    public function __debugInfo(): array
+    {
+        return [
+            'dto' => static::class,
+            'properties' => [
+                'available' => array_keys(get_object_vars($this)),
+                'passed' => LoggerContext::isset(static::class, 'properties')
+                    ? array_keys(LoggerContext::getProperties(static::class))
+                    : array_keys(get_object_vars($this)),
+                'difference' => LoggerContext::isset(static::class, 'properties')
+                    ? array_diff(array_keys(LoggerContext::getProperties(static::class)), array_keys(get_object_vars($this)))
+                    : [],
+            ],
+            'strict' => LoggerContext::getStrict(static::class),
+            'enabled_logger_context' => LoggerContext::isEnabled(static::class),
+            'errors' => LoggerContext::getErrors(static::class),
+        ];
+    }
+
 
 }
