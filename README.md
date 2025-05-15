@@ -20,7 +20,7 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 - 🔧 `debug()` method with full structural output
 - 📤 Framework-agnostic — works with pure PHP classes
 - 🔩 Optimized for PHP 8.1+
-- ⚙️ Compatible with Symfony 6.1, Laravel 10+, and modern typed PHP codebases.
+- ⚙️ Compatible with Symfony 6.4, Laravel 10+, and modern typed PHP codebases.
 
 ---
 
