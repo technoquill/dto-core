@@ -1,10 +1,11 @@
 <?php
+declare(strict_types=1);
 /**
  * @author M.Kulyk
  * @copyright 2021 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.1.0
+ * @version 1.0.0
  * @package Technoquill\DTO
  * @since 1.0.0
  */
@@ -22,25 +23,15 @@ use Technoquill\DTO\AbstractDTO;
  */
 trait DebuggableTrait
 {
-    /**
-     * @var bool
-     */
-    protected static bool $debug = false;
-
 
     /**
      * @return AbstractDTO|DebuggableTrait
      */
     public function debug(): self
     {
-        static::$debug = true;
         VarDumper::dump($this);
         return $this;
     }
 
-    public static function isDebugEnabled(): bool
-    {
-        return static::$debug;
-    }
 
 }

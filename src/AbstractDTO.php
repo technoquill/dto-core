@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * @author M.Kulyk
  * @copyright 2025 M.Kulyk
@@ -29,32 +30,7 @@ use Technoquill\DTO\Traits\DTOTrait;
 abstract class AbstractDTO implements DTOInterface
 {
 
-    /**
-     * Holds the errors that occurred during the DTO initialization process.
-     *
-     * @var array
-     */
-    protected static array $errors = [];
-
-    /**
-     * Flag to enable strict validation of properties.
-     *
-     * @var array
-     */
-    protected static array $strict = [];
-
-
-    /**
-     * Properties passed through DTO
-     *
-     * @var array
-     */
-    protected static array $dtoProperties = [];
-
-
-
     use DTOTrait, DebuggableTrait;
-
 
     /**
      * Creates a new instance of the DTO class using the provided arguments.
@@ -66,14 +42,11 @@ abstract class AbstractDTO implements DTOInterface
      */
     public static function make(array $data, bool $strict = true): static
     {
-        // Set the strict mode flag.
-        self::$strict[static::class] = $strict;
-
         // Ensure that the DTO does not mix constructor-based and property-based approaches for defining its structure.
         self::assertNoMixedStructure();
 
         // Validate the arguments and normalize them. If strict validation is enabled, throw an exception if any of the arguments are missing.
-        $data = self::propertiesValidate($data, $strict);
+        $data = self::collect($data, $strict);
 
         // If the class has a constructor, use it to initialize the properties.
         $reflectionClass = new ReflectionClass(static::class);
@@ -98,28 +71,6 @@ abstract class AbstractDTO implements DTOInterface
         return json_decode(
             json_encode($this, JSON_THROW_ON_ERROR), true, 512, JSON_THROW_ON_ERROR
         );
-    }
-
-
-    /**
-     * @return array
-     */
-    public function __debugInfo()
-    {
-        return [
-            'dto' => static::class,
-            'properties_available' => array_keys(get_object_vars($this)),
-            'properties_passed' => !isset(static::$dtoProperties[static::class])
-                ? array_keys(get_object_vars($this))
-                : (static::$dtoProperties[static::class] ?? []),
-            'properties_diff' => isset(self::$dtoProperties[static::class])
-                ? array_diff(self::$dtoProperties[static::class], array_keys(get_object_vars($this)))
-                : [],
-            'strict_mode' => static::$strict[static::class] ?? true,
-            'current_errors' => static::$errors[static::class] ?? [],
-            'has_level_errors' => array_sum(array_map('count', static::$errors)),
-        ];
-
     }
 
 }

@@ -77,9 +77,9 @@ $data = [
     'is_paid' => true
 ];
 
-$payment = PaymentDTO::make($data, strict: false)->debug();
+$payment = PaymentDTO::make($data, false)->debug();
 // or
-$payment = PaymentDTO::make($data, strict: false);
+$payment = PaymentDTO::make($data, false);
 if (!$payment->isValid()) {
     dump($payment->getErrors());
 }
@@ -128,6 +128,8 @@ src/
 ├── AbstractDTO.php
 ├── Contracts/
 │   └── DTOInterface.php
+├── Support/
+│   └── LoggerContext.php
 ├── Traits/
 │   ├── DTOTrait.php
 │   └── DebuggableTrait.php
