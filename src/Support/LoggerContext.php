@@ -5,9 +5,9 @@ declare(strict_types=1);
  * @copyright 2021 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.1.0
+ * @version 1.0.0
  * @package Technoquill\DTO
- * @since 1.0.0
+ * @since 1.1.0
  */
 
 
