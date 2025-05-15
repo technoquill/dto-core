@@ -4,7 +4,7 @@
  * @copyright 2021 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.1.1
+ * @version 1.1.0
  * @package Technoquill\DTO
  * @since 1.0.0
  */
@@ -13,6 +13,7 @@ namespace Technoquill\DTO\Traits;
 
 
 use Symfony\Component\VarDumper\VarDumper;
+use Technoquill\DTO\AbstractDTO;
 
 
 /**
@@ -21,35 +22,14 @@ use Symfony\Component\VarDumper\VarDumper;
  */
 trait DebuggableTrait
 {
-
     /**
      * @var bool
      */
     protected static bool $debug = false;
 
-    /**
-     * @return array
-     */
-    public function __debugInfo()
-    {
-        return [
-            'dto' => static::class,
-            'properties_available' => array_keys(get_object_vars($this)),
-            'properties_passed' => !isset(static::$dtoProperties[static::class])
-                ? array_keys(get_object_vars($this))
-                : (static::$dtoProperties[static::class] ?? []),
-            'properties_diff' => isset(self::$dtoProperties[static::class])
-                ? array_diff(self::$dtoProperties[static::class], array_keys(get_object_vars($this)))
-                : [],
-            'strict_mode' => static::$strict[static::class] ?? true,
-            'current_errors' => static::$errors[static::class] ?? [],
-            'has_level_errors' => array_sum(array_map('count', static::$errors)),
-        ];
-
-    }
 
     /**
-     * @return self
+     * @return AbstractDTO|DebuggableTrait
      */
     public function debug(): self
     {
