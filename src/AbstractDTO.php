@@ -100,10 +100,4 @@ abstract class AbstractDTO implements DTOInterface
         );
     }
 
-
-    public function __destruct()
-    {
-        self::$dtoProperties = [];
-    }
-
 }
