@@ -11,16 +11,16 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 
 ## 🚀 Features
 
-- 🔒 Strict or lenient validation modes
-- 🧱 Full support for nested DTOs (recursive)
-- 🧪 Property type validation and class-level error tracking
-- ⚡ `make()` method (recommended) for flexible and different modes using, or `new DTOClass()` for strict using
-- 📚 `toArray()` method converts the current object instance into an array representation
-- 🧩 `Closure` support for lazy-loaded properties
-- 🔧 `debug()` method with full structural output
-- 📤 Framework-agnostic — works with pure PHP classes
-- 🔩 Optimized for PHP 8.1+
-- ⚙️ Compatible with Symfony 6.4, Laravel 10+, and modern typed PHP codebases.
+- Strict or lenient validation modes
+- Full support for nested DTOs (recursive)
+- Property type validation and class-level error tracking
+- `make()` method (recommended) for flexible and different modes using, or `new DTOClass()` for strict using
+- `toArray()` method converts the current object instance into an array representation
+- `Closure` support for lazy-loaded properties
+- `debug()` method with full structural output
+- Framework-agnostic — works with pure PHP classes
+- Optimized for PHP 8.1+
+- Compatible with Symfony 6.4, Laravel 10+, and modern typed PHP codebases.
 
 ---
 
