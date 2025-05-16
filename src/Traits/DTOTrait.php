@@ -53,20 +53,17 @@ trait DTOTrait
         $data = self::normalizeDataValue($data);
         if (!$strict) {
             LoggerContext::enable($class);
+            // Reset the logger context for the current class.
+            LoggerContext::reset($class);
+            // Set the strict mode flag.
+            LoggerContext::set($class, 'strict', false);
+            // Fill data to compare differences between DTO properties and passed properties
+            LoggerContext::set($class, 'properties', $data);
         }
 
-        // Reset the logger context for the current class.
-        LoggerContext::reset($class);
-        // Set the strict mode flag.
-        LoggerContext::set($class, 'strict', $strict);
-        // Fill data to compare differences between DTO properties and passed properties
-        LoggerContext::set($class, 'properties', $data);
-
         foreach ($data as $key => $value) {
-            if (!property_exists($class, $key)) {
-                if (!$strict) {
-                    unset($data[$key]);
-                }
+            if (!property_exists($class, $key) && !$strict) {
+                unset($data[$key]);
                 LoggerContext::set($class, 'errors', ["Property {$class}::\${$key} doesn't exist!"]);
             }
 
@@ -94,7 +91,7 @@ trait DTOTrait
                     $isTypeMismatch = !in_array(gettype($value), array_map([static::class, 'normalizeType'], $types), true);
                 }
 
-                if (!$value instanceof DTOInterface && $isTypeMismatch) {
+                if (!$value instanceof DTOInterface && $isTypeMismatch && !$strict) {
                     LoggerContext::set($class, 'errors', [
                         "Property {$class}::\${$key} must be {$expectedType}, but " . gettype($value) . " given!"
                     ]);
