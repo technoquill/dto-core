@@ -5,7 +5,7 @@ declare(strict_types=1);
  * @copyright 2025 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.0.1
+ * @version 1.0.2
  * @package Technoquill\DTO
  * @since 1.0.0
  */
@@ -59,6 +59,8 @@ trait DTOTrait
             LoggerContext::set($class, 'strict', false);
             // Fill data to compare differences between DTO properties and passed properties
             LoggerContext::set($class, 'properties', $data);
+        } else {
+            LoggerContext::reset($class);
         }
 
         foreach ($data as $key => $value) {
@@ -109,6 +111,7 @@ trait DTOTrait
      *
      * @param array $arguments
      * @return array
+     *
      */
     private static function normalizeDataValue(array $arguments): array
     {
@@ -123,6 +126,10 @@ trait DTOTrait
         return $normalized;
     }
 
+    /**
+     * @param string $type
+     * @return string
+     */
     private static function normalizeType(string $type): string
     {
         return match ($type) {
@@ -156,9 +163,13 @@ trait DTOTrait
 
     /**
      * @return bool
+     * @deprecated
      */
     public function isValid(): bool
     {
+        trigger_error(
+            'Method isValid() is deprecated. Use debug() or getErrors() instead.', E_USER_DEPRECATED
+        );
         return empty(LoggerContext::getAllErrors());
     }
 
@@ -167,14 +178,26 @@ trait DTOTrait
      */
     public function getErrors(): array
     {
-        return LoggerContext::getAllErrors();
+        return array_merge(LoggerContext::getAllErrors(), $this->loggerContextWarning());
+    }
+
+    /**
+     * @return array|string[]
+     * @since 1.0.2
+     */
+    private function loggerContextWarning(): array
+    {
+        return !LoggerContext::isEnabled(static::class)
+            ? ['warnings' => 'DTO LoggerContext is disabled! LoggerContext works only in lenient mode.']
+            : [];
     }
 
 
     /**
      * @return array
      */
-    public function __debugInfo(): array
+    public
+    function __debugInfo(): array
     {
         return [
             'dto' => static::class,

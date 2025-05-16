@@ -1,6 +1,7 @@
 # Type-safe, test-friendly, and extendable DTO
 
 ![PHP Version](https://img.shields.io/badge/PHP-8.1%2B-blue?style=flat-square&logo=php)
+![GitHub tag](https://img.shields.io/github/v/tag/technoquill/dto-core?label=version&style=flat-square)
 ![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)
 ![Repo size](https://img.shields.io/github/repo-size/technoquill/dto-core?style=flat-square)
 
@@ -189,9 +190,8 @@ dd($user);
 
 // or
 $dtoData = PaymentDTO::make($data, false);
-if (!$dtoData->isValid()) {
-    dump($dtoData->getErrors());
-}
+dd($dtoData->getErrors());
+
 
 // Data output to an array is supported
 $payment = PaymentDTO::make($data)->toArray();
