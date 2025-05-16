@@ -55,18 +55,19 @@ composer require technoquill/dto-core
 final class UserDTO extends AbstractDTO
 {
     public function __construct(
-        public int    $id,
-        public string $type,
-        public string $first_name,
-        public string $last_name,
-        public string $email,
-        public string $phone,
-        public array  $address = [], // for ex. relation
-        public string $annotation,
-        public bool   $blocked,
-        public string $created_at
+        public int                  $id,
+        public string               $type,
+        public string               $first_name,
+        public string               $last_name,
+        public string               $email,
+        public string               $phone,
+        public UserAddressDTO|array $address = [], // for ex. relation
+        public string               $annotation,
+        public bool                 $blocked,
+        public string               $created_at
     )
-    {}
+    {
+    }
 }
 
 final class UserAddressDTO extends AbstractDTO
