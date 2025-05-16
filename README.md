@@ -36,15 +36,94 @@ It supports strict/lenient modes, nested DTOs, lazy evaluation via `Closure`, an
 Add to composer.json
 ```json
 "repositories": [
-  {
-    "type": "vcs",
-    "url": "https://github.com/technoquill/dto-core"
-  }
+{
+"type": "vcs",
+"url": "https://github.com/technoquill/dto-core"
+}
 ]
 ```
 ```bash
 composer require technoquill/dto-core
 ```
+
+# DTO Property Declaration Guide
+
+`dto-core` supports two primary approaches for defining DTO properties, depending on the desired level of strictness, static typing, and compatibility with constructor-based instantiation.
+
+---
+
+## ✅ 1. Constructor-Based Declaration (Immutable DTOs)
+
+Properties are declared directly in the constructor using PHP 8.1+ promoted parameters.
+
+```php
+final class UserDTO extends AbstractDTO
+{
+    public function __construct(
+        public int $id,
+        public string $email,
+        public bool $blocked,
+        public string $created_at
+    ) {}
+}
+```
+
+- Ideal for **strict, fully defined DTOs**
+- Perfect compatibility with `make()` and native `new DTO(...)`
+- Properties are readonly by default and ideal for domain logic
+
+---
+
+## ✅ 2. Class Property Declaration (Dynamic DTOs)
+
+Properties are declared as public class-level variables (optionally with defaults), typically without a constructor.
+
+```php
+final class UserAddressDTO extends AbstractDTO
+{
+    public string $street;
+    public string $city;
+    public string $postalCode;
+    public string $country;
+    public ?string $state = null;
+    public ?string $houseNumber = null;
+    public ?string $apartment = null;
+}
+```
+
+- Useful for **flexible, input-bound structures**
+- Well-suited for use with `make(array $data)` where construction is data-driven
+- Allows partial initialization (`strict: false`)
+
+---
+
+## ⚠️ Mixed Declaration Is Not Supported
+
+> Mixing constructor-promoted properties **and** public properties in the same DTO is not allowed.
+
+```php
+// ❌ This is not valid:
+final class InvalidDTO extends AbstractDTO
+{
+    public string $name;
+
+    public function __construct(
+        public int $id
+    ) {}
+}
+```
+
+> This ensures predictable property population, reliable type enforcement, and consistent validation.
+
+---
+
+## 🔁 Usage Flexibility
+
+- Use constructor DTOs for **domain-level, immutable structures**
+- Use dynamic DTOs for **input mapping, transformation, or API data**
+
+Both styles are fully supported by `make()`, `debug()`, `isValid()`, and nested DTO handling.
+
 
 ---
 
@@ -154,7 +233,7 @@ DTOs can also be instantiated directly via the constructor (including nested DTO
 
 > **Note:**  
 > Always works in strict mode
-> 
+>
 ```php
 $payment = (new PaymentDTO(435, 765.35))->toArray();
 ```
