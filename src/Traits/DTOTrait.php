@@ -5,7 +5,7 @@ declare(strict_types=1);
  * @copyright 2025 M.Kulyk
  * @license MIT
  * @link https://github.com/technoquill/dto-core
- * @version 1.0.0
+ * @version 1.0.1
  * @package Technoquill\DTO
  * @since 1.0.0
  */
@@ -17,7 +17,9 @@ use Exception;
 use LogicException;
 use ReflectionClass;
 use ReflectionException;
+use ReflectionNamedType;
 use ReflectionProperty;
+use ReflectionUnionType;
 use RuntimeException;
 use Technoquill\DTO\Contracts\DTOInterface;
 use Technoquill\DTO\Support\LoggerContext;
@@ -47,7 +49,7 @@ trait DTOTrait
     private static function collect(array $data, bool $strict): array
     {
         $class = static::class;
-        $reflectionClass = new ReflectionClass($class);
+
         $data = self::normalizeDataValue($data);
         if (!$strict) {
             LoggerContext::enable($class);
@@ -67,14 +69,39 @@ trait DTOTrait
                 }
                 LoggerContext::set($class, 'errors', ["Property {$class}::\${$key} doesn't exist!"]);
             }
+
+            // Comparing $data types with DTO properties types
             if (property_exists($class, $key)) {
-                $propertyType = $reflectionClass->getProperty($key)?->getType()?->getName();
-                if (!$value instanceof DTOInterface && static::normalizeType($propertyType) !== gettype($value)) {
-                    LoggerContext::set($class, 'errors', ["Property {$class}::\${$key} must be " . $propertyType . " but " . gettype($value) . " given!"]);
+                $reflection = new ReflectionClass($class);
+                $propertyRef = $reflection->getProperty($key);
+                $propertyType = $propertyRef->getType();
+
+                $expectedType = '';
+                $isTypeMismatch = false;
+
+                if ($propertyType instanceof ReflectionNamedType) {
+                    $expectedType = $propertyType->getName();
+                    $isTypeMismatch = static::normalizeType($expectedType) !== gettype($value);
+                }
+
+                if ($propertyType instanceof ReflectionUnionType) {
+                    $types = array_map(
+                        static fn($type) => $type->getName(),
+                        $propertyType->getTypes()
+                    );
+
+                    $expectedType = implode('|', $types);
+                    $isTypeMismatch = !in_array(gettype($value), array_map([static::class, 'normalizeType'], $types), true);
+                }
+
+                if (!$value instanceof DTOInterface && $isTypeMismatch) {
+                    LoggerContext::set($class, 'errors', [
+                        "Property {$class}::\${$key} must be {$expectedType}, but " . gettype($value) . " given!"
+                    ]);
                 }
             }
-        }
 
+        }
         return $data;
     }
 
