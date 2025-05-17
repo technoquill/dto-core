@@ -123,7 +123,7 @@ final class InvalidDTO extends AbstractDTO
 - Use constructor DTOs for **domain-level, immutable structures**
 - Use dynamic DTOs for **input mapping, transformation, or API data**
 
-Both styles are fully supported by `make()`, `debug()`, `isValid()`, and nested DTO handling.
+Both styles are fully supported by `make()`, `debug()`, `toArray()`, and nested DTO handling.
 
 
 ---
@@ -177,7 +177,7 @@ $user = UserDTO::make([
         'city' => 'New York',
         'postalCode' => '10001',
         'country' => 'USA',
-        //'state' => 'NY', // optional; dto makes it nullable
+        //'state' => 'NY', // optional; dto makes it nullable, because the property may be NULL by default
         'houseNumber' => '123',
         'apartment' => '123A',
     ])->toArray(),
